@@ -13,8 +13,11 @@ class AsistenteReporteMayor(models.TransientModel):
 
     def _default_cuenta(self):
         if len(self.env.context.get('active_ids', [])) > 0:
+            print("que pedo")
             return self.env.context.get('active_ids')
         else:
+            accounts = self.env['account.account'].search([]).ids
+            print(accounts,"acc")
             return self.env['account.account'].search([]).ids
 
     cuentas_id = fields.Many2many("account.account", string="Cuentas", required=True, default=_default_cuenta)
@@ -26,15 +29,12 @@ class AsistenteReporteMayor(models.TransientModel):
     name = fields.Char('Nombre archivo', size=32)
     archivo = fields.Binary('Archivo', filters='.xls')
 
-    def print_report(self):    
+    def print_report(self):
         data = {
              'ids': [],
              'model': 'l10n_sv_extra.asistente_reporte_mayor',
              'form': self.read()[0]
         }
-        if len(data['form']['grupos_id']) == 0:
-            raise UserError('Debe seleccionar por lo menos un grupo de cuentas.')
-
         return self.env.ref('l10n_sv_extra.action_reporte_mayor').report_action(self, data=data)
 
     def print_report_excel(self):

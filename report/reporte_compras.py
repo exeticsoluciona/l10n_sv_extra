@@ -21,7 +21,7 @@ class ReporteCompras(models.AbstractModel):
         journal_ids = [x for x in datos['diarios_id']]
         facturas = self.env['account.move'].search([
             ('state','in',['posted']),
-            ('type' if 'type' in self.env['account.move'].fields_get() else 'move_type','in',['in_invoice','in_refund']),
+            ('move_type','in',['in_invoice','in_refund']),
             ('journal_id','in',journal_ids),
             ('date','<=',datos['fecha_hasta']),
             ('date','>=',datos['fecha_desde']),
@@ -40,12 +40,16 @@ class ReporteCompras(models.AbstractModel):
             tipo_cambio = 1
             if f.currency_id.id != f.company_id.currency_id.id:
                 total = 0
-                for l in f.move_id.line_ids:
+                for l in f.line_ids:
                     if l.account_id.id == f.account_id.id:
                         total += l.credit - l.debit
                 tipo_cambio = abs(total / f.amount_total)
 
             tipo = 'FACT'
+            if f.move_type != 'in_invoice':
+                tipo = 'NC'
+            if f.partner_id.pequenio_contribuyente:
+                tipo += ' PEQ'
 
             linea = {
                 'correlativo': correlativo,

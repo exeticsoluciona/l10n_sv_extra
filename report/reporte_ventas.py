@@ -22,7 +22,7 @@ class ReporteVentas(models.AbstractModel):
         journal_ids = [x for x in datos['diarios_id']]
         facturas = self.env['account.move'].search([
             ('state','in',['posted','cancel']),
-            ('type' if 'type' in self.env['account.move'].fields_get() else 'move_type','in',['out_invoice','out_refund']),
+            ('move_type','in',['out_invoice','out_refund']),
             ('journal_id','in',journal_ids),
             ('date','<=',datos['fecha_hasta']),
             ('date','>=',datos['fecha_desde']),
@@ -43,14 +43,31 @@ class ReporteVentas(models.AbstractModel):
                 tipo_cambio = abs(total / f.amount_total)
 
             tipo = 'FACT'
+            if f.move_type == 'out_refund':
+                if f.amount_untaxed >= 0:
+                    tipo = 'NC'
+                else:
+                    tipo = 'ND'
 
-            numero = f.name or '-'
+            numero = f.name or f.numero_viejo or '-',
+
+            # Por si es un diario de rango de facturas
+            if f.journal_id.facturas_por_rangos:
+                numero = f.name
+
+            # Por si usa factura electrónica
+            if 'firma_gface' in f.fields_get() and f.firma_gface:
+                numero = f.name
+
+            # Por si usa tickets
+            if 'requiere_resolucion' in f.journal_id.fields_get() and f.journal_id.requiere_resolucion:
+                numero = f.name
 
             if f.name:
                 serie = f.name#[0:9]
             else:
                 serie = ''
-                
+
             linea = {
                 'correlativo': correlativo,
                 'serie': serie,
@@ -97,6 +114,7 @@ class ReporteVentas(models.AbstractModel):
 
                 linea['base'] += r['total_excluded']
                 totales[tipo_linea]['total'] += r['total_excluded']
+                print(datos, "datos!!!")
                 if len(l.tax_ids) > 0:
                     linea[tipo_linea] += r['total_excluded']
                     totales[tipo_linea]['neto'] += r['total_excluded']

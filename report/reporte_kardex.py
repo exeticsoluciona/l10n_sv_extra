@@ -87,8 +87,7 @@ class ReporteKardex(models.AbstractModel):
             for group in groups:
                 valor = self.env.company.currency_id.round(group['value'])
                 cantidad = group['quantity']
-                if cantidad != 0:
-                    costo = valor / cantidad
+                costo = valor / cantidad
 
             detalle['costo'] = costo
 
@@ -116,11 +115,12 @@ class ReporteKardex(models.AbstractModel):
     
     @api.model
     def _get_report_values(self, docids, data=None):
-        self.model = self.env.context.get('active_model')
-        docs = self.env[self.model].browse(self.env.context.get('active_ids', []))
+        model = 'report.l10n_sv_extra.reporte_kardex'
+        docs = self.env[model].browse(self.env.context.get('active_ids', []))
+
         return  {
             'doc_ids': self.ids,
-            'doc_model': self.model,
+            'doc_model': model,
             'data': data['form'],
             'docs': docs,
             'lineas': self.lineas,

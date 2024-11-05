@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api, _
-from openerp.exceptions import UserError, ValidationError
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 import time
 import datetime
 import xlsxwriter
@@ -13,14 +13,9 @@ class AsistenteKardex(models.TransientModel):
     _name = 'l10n_sv_extra.asistente_kardex'
     _description = 'Kardex'
 
-    def _default_producto(self):
-        if len(self.env.context.get('active_ids', [])) > 0:
-            return self.env.context.get('active_ids')[0]
-        else:
-            return None
-
     ubicacion_id = fields.Many2one("stock.location", string="Ubicacion", required=True)
-    producto_ids = fields.Many2many("product.product", string="Productos", required=True)
+    producto_ids = fields.Many2many("product.product", string="Productos", required=True,
+                                    default=lambda self: [(6, 0, self.env.context.get('active_ids', []))])
     fecha_desde = fields.Date(string="Fecha Inicial", required=True)
     fecha_hasta = fields.Date(string="Fecha Final", required=True)
     archivo_excel = fields.Binary('Archivo excel')

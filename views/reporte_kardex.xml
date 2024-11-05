@@ -10,7 +10,7 @@
                     REGISTRO DE CONTROL DE INVENTARIOS (Kardex)<br/></p>
                     <br/><br/>
 
-                    <table style="width:300px">
+                    <table style="width:300px" class="borderless">
                         <tr>
                             <td style="width:75px">Período:</td>
                             <td style="width:225px"><span t-esc="data['fecha_desde']" t-options="{'widget': 'date'}"/> - <span t-esc="data['fecha_hasta']" t-options="{'widget': 'date'}"/></td>
