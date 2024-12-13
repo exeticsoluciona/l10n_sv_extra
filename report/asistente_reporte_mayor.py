@@ -6,18 +6,16 @@ import time
 import xlsxwriter
 import base64
 import io
-import logging
+from .formatos_excel import obtener_formatos_excel
 
 class AsistenteReporteMayor(models.TransientModel):
     _name = 'l10n_sv_extra.asistente_reporte_mayor'
 
     def _default_cuenta(self):
         if len(self.env.context.get('active_ids', [])) > 0:
-            print("que pedo")
             return self.env.context.get('active_ids')
         else:
             accounts = self.env['account.account'].search([]).ids
-            print(accounts,"acc")
             return self.env['account.account'].search([]).ids
 
     cuentas_id = fields.Many2many("account.account", string="Cuentas", required=True, default=_default_cuenta)
@@ -48,73 +46,62 @@ class AsistenteReporteMayor(models.TransientModel):
 
             f = io.BytesIO()
             libro = xlsxwriter.Workbook(f)
-            hoja = libro.add_worksheet('Reporte')
-            formato_fecha = libro.add_format({'num_format': 'dd/mm/yy'})
+            hoja = libro.add_worksheet('LIBRO MAYOR')
 
-            hoja.write(0, 0, 'LIBRO MAYOR')
-            hoja.write(2, 0, 'NUMERO DE IDENTIFICACION TRIBUTARIA')
-            hoja.write(2, 1, w.cuentas_id[0].company_id.partner_id.vat)
-            hoja.write(3, 0, 'NOMBRE COMERCIAL')
-            hoja.write(3, 1, w.cuentas_id[0].company_id.partner_id.name)
-            hoja.write(2, 3, 'DOMICILIO FISCAL')
-            hoja.write(2, 4, w.cuentas_id[0].company_id.partner_id.street)
-            hoja.write(3, 3, 'REGISTRO DEL')
-            hoja.write(3, 4, w.fecha_desde, formato_fecha)
-            hoja.write(3, 5, 'AL')
-            hoja.write(3, 6, w.fecha_hasta, formato_fecha)
-
+            formatos = obtener_formatos_excel(libro)
+            # ANCHOOO
+            hoja.set_column(1, 1, 8)  # No.
+            hoja.set_column(2, 2, 10)  #FECHA
+            hoja.set_column(3, 3, 30)  #Concepto
+            hoja.set_column(4, 4, 15)  #Debe
+            hoja.set_column(5, 5, 15)  #Haber
+            hoja.set_column(6, 6, 15)  #Acumulado
+            # ANCHOOOO
+            hoja.merge_range('B3:H3', self.env.company.name, formatos['title_format'])
+            hoja.merge_range('B4:H4', 'LIBRO DIARIO MAYOR', formatos['title_format'])
             y = 5
-            if w['agrupado_por_dia']:
-                lineas = res['lineas']
+            fecha_hasta = w['fecha_hasta']
+            hoja.merge_range(y,1,y,3,f'Movimientos al {fecha_hasta}',formatos['text_bottom'])
+            hoja.write(y,4,'',formatos['text_bottom'])
+            hoja.merge_range(y,5,y,6,'Expresado en dolares',formatos['text_bottom'])
+            y += 1
+            hoja.write(y,1,'',formatos['text_bottom'])
+            hoja.write(y,2,'Fecha',formatos['text_bottom'])
+            hoja.write(y,3,'Conceptos',formatos['text_bottom'])
+            hoja.write(y,4,'Debe',formatos['text_bottom'])
+            hoja.write(y,5,'Haber',formatos['text_bottom'])
+            hoja.write(y,6,'Saldo Acumulado',formatos['text_bottom'])
 
-                hoja.write(y, 0, 'Codigo')
-                hoja.write(y, 1, 'Cuenta')
-                hoja.write(y, 2, 'fecha')
-                hoja.write(y, 3, 'Saldo Inicial')
-                hoja.write(y, 4, 'Debe')
-                hoja.write(y, 5, 'Haber')
-                hoja.write(y, 6, 'Saldo Final')
 
-                for cuenta in lineas:
-                    y += 1
-                    hoja.write(y, 0, cuenta['codigo'])
-                    hoja.write(y, 1, cuenta['cuenta'])
-                    hoja.write(y, 3, cuenta['saldo_inicial'])
-                    hoja.write(y, 4, cuenta['total_debe'])
-                    hoja.write(y, 5, cuenta['total_haber'])
-                    hoja.write(y, 6, cuenta['saldo_final'])
-                    for fechas in cuenta['fechas']:
-                        y += 1
-                        hoja.write(y, 2, fechas['fecha'])
-                        hoja.write(y, 4, fechas['debe'])
-                        hoja.write(y, 5, fechas['haber'])
-                    y += 1
-            else:
-                lineas = res['lineas']
-                totales = res['totales']
+            lineas = res['lineas']
+            totales = res['totales']
 
-                hoja.write(y, 0, 'Codigo')
-                hoja.write(y, 1, 'Cuenta')
-                hoja.write(y, 2, 'Saldo Inicial')
-                hoja.write(y, 3, 'Debe')
-                hoja.write(y, 4, 'Haber')
-                hoja.write(y, 5, 'Saldo Final')
-
-                for linea in lineas:
-                    y += 1
-
-                    hoja.write(y, 0, linea['codigo'])
-                    hoja.write(y, 1, linea['cuenta'])
-                    hoja.write(y, 2, linea['saldo_inicial'])
-                    hoja.write(y, 3, linea['debe'])
-                    hoja.write(y, 4, linea['haber'])
-                    hoja.write(y, 5, linea['saldo_final'])
-
+            for cuenta in lineas:
                 y += 1
-                hoja.write(y, 1, 'Totales')
-                hoja.write(y, 3, totales['debe'])
-                hoja.write(y, 4, totales['haber'])
+                hoja.write(y, 1, cuenta['codigo'],formatos['total_noborder'])
+                hoja.write(y, 3, cuenta['cuenta'],formatos['total_noborder'])
+                hoja.write(y, 5,'Saldo Anterior')
+                hoja.write(y, 6, cuenta['saldo_inicial'],formatos['total_noborder'])
+                # LOS MIVIMIENTOS POR FECHAS
+                for fechas in cuenta['fechas']:
+                    y += 1
+                    hoja.write(y, 2, fechas['fecha'],formatos['fecha_mayor'])
+                    hoja.write(y, 3, 'Movimientos Del Día')
+                    hoja.write(y, 4, fechas['debe'],formatos['total_noborder'])
+                    hoja.write(y, 5, fechas['haber'],formatos['total_noborder'])
+                y += 1
 
+                hoja.write(y, 3, 'TOTAL')
+                total_acumulado =  cuenta['saldo_inicial'] + cuenta['total_debe'] -cuenta['total_haber']
+                hoja.write(y, 4, cuenta['total_debe'],formatos['total_topbottom'])
+                hoja.write(y, 5, cuenta['total_haber'],formatos['total_topbottom'])
+                hoja.write(y, 6, total_acumulado,formatos['total_topbottom'])
+                y += 1
+
+            y+=1
+            hoja.write(y, 3, 'GRAN TOTAL', formatos['total_topbottom'])
+            hoja.write(y, 4, totales['debe'], formatos['total_topbottom'])
+            hoja.write(y, 5, totales['haber'], formatos['total_topbottom'])
             libro.close()
             datos = base64.b64encode(f.getvalue())
             self.write({'archivo':datos, 'name':'libro_mayor.xlsx'})

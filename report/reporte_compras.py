@@ -12,11 +12,19 @@ class ReporteCompras(models.AbstractModel):
         totales = {}
 
         totales['num_facturas'] = 0
-        totales['compra'] = {'exento':0,'neto':0,'iva':0,'percepcion':0,'total':0}
+        totales['grand_total'] = {
+            'exento_interno':0,
+            'exento_importaciones':0,
+            'exento_internaciones':0,
+            'gravadas_internas': 0,
+            'gravadas_importaciones': 0,
+            'gravadas_internaciones': 0,
+            'iva':0,
+            'total':0,
+            'terceros':0,
+            'excl':0,
+        }
         totales['servicio'] = {'exento':0,'neto':0,'iva':0,'percepcion':0,'total':0}
-        totales['importacion'] = {'exento':0,'neto':0,'iva':0,'percepcion':0,'total':0}
-        totales['combustible'] = {'exento':0,'neto':0,'iva':0,'percepcion':0,'total':0}
-        totales['pequenio_contribuyente'] = 0
 
         journal_ids = [x for x in datos['diarios_id']]
         facturas = self.env['account.move'].search([
@@ -53,23 +61,22 @@ class ReporteCompras(models.AbstractModel):
 
             linea = {
                 'correlativo': correlativo,
-                'estado': f.state,
-                'tipo': tipo,
                 'fecha': f.date,
-                'numero': f.name or '',
-                'proveedor': f.partner_id,
-                'compra': 0,
-                'compra_exento': 0,
-                'servicio': 0,
-                'servicio_exento': 0,
-                'combustible': 0,
-                'combustible_exento': 0,
-                'importacion': 0,
-                'importacion_exento': 0,
-                'base': 0,
+                'numero_comprobante': f.payment_reference or '',
+                'numero_registro': f.partner_id.numero_registro or '',
+                'nit': f.partner_id.vat,
+                'proveedor': f.partner_id.name,
+                'exentas_internas': 0,
+                'exentas_importaciones': 0,
+                'exentas_internaciones': 0,
+
+                'gravadas_internas': 0,
+                'gravadas_importaciones': 0,
+                'gravadas_internaciones': 0,
                 'iva': 0,
-                'percepcion': 0,
-                'total': 0
+                'total': 0,
+                'terceros':0,
+                'excl':0
             }
 
             correlativo += 1
@@ -87,31 +94,28 @@ class ReporteCompras(models.AbstractModel):
 
                 r = l.tax_ids.compute_all(precio, currency=f.currency_id, quantity=l.quantity, product=l.product_id, partner=f.partner_id)
 
-                linea['base'] += r['total_excluded']
-                totales[tipo_linea]['total'] += r['total_excluded']
+
                 if len(l.tax_ids) > 0:
-                    linea[tipo_linea] += r['total_excluded']
-                    totales[tipo_linea]['neto'] += r['total_excluded']
                     for i in r['taxes']:
                         if i['id'] == datos['impuesto_id'][0]:
+                            # AQUI DEBERIA DE CLASIFICARLO SEGUN EL TIPO DE GRAVADAS POR AHORA TODAS VAN PARA INTERNAS
+                            linea['gravadas_internas'] += r['total_excluded']
                             linea['iva'] += i['amount']
-                            totales[tipo_linea]['iva'] += i['amount']
-                            totales[tipo_linea]['total'] += i['amount']
-                        elif i['id'] == datos['percepcion_id'][0]:
-                            linea['percepcion'] += i['amount']
-                            totales[tipo_linea]['percepcion'] += i['amount']
-                            totales[tipo_linea]['total'] += i['amount']
+                            # GRAND TOTAL
+                            totales['grand_total']['gravadas_internas'] += r['total_excluded']
+                            totales['grand_total']['iva'] += i['amount']
                         elif i['amount'] > 0:
-                            linea[f.tipo_gasto+'_exento'] += i['amount']
+                            linea['exentas_internas'] += r['total_excluded']
                             totales[tipo_linea]['exento'] += i['amount']
                 else:
-                    linea[tipo_linea+'_exento'] += r['total_excluded']
-                    totales[tipo_linea]['exento'] += r['total_excluded']
+                    linea['exentas_internas'] += r['total_excluded']
+                    totales[tipo_linea]['exento'] += i['amount']
 
                 linea['total'] += precio * l.quantity
+                totales['grand_total']['total'] += precio * l.quantity
 
-            if f.partner_id.pequenio_contribuyente:
-                totales['pequenio_contribuyente'] += linea['base']
+            # if f.partner_id.pequenio_contribuyente:
+            #     totales['pequenio_contribuyente'] += linea['base']
 
             lineas.append(linea)
 
