@@ -6,6 +6,7 @@ import logging
 
 class ReporteKardex(models.AbstractModel):
     _name = 'report.l10n_sv_extra.reporte_kardex'
+    _description = 'Kardex'
 
     def inicial(self, datos):
         self.env.cr.execute("select sum(qty_in) as entrada, sum(qty_out) as salida, product_id \

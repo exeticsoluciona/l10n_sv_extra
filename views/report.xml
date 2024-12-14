@@ -40,11 +40,26 @@
 
         <menuitem id="menu_informes" name="Informes de El Salvador" parent="account.menu_finance_reports"/>
 
-        <act_window id="window_reporte_ventas" name="Libro de ventas" res_model="l10n_sv_extra.asistente_reporte_ventas"
-                    binding_model="account.journal" view_mode="form" target="new"/>
-        <menuitem action="window_reporte_ventas" id="menu_asistente_reporte_ventas" parent="menu_informes"/>
-        <report id="action_reporte_ventas" model="l10n_sv_extra.asistente_reporte_ventas" string="Libro de ventas"
-                report_type="qweb-pdf" name="l10n_sv_extra.reporte_ventas" file="l10n_sv_extra.reporte_ventas"/>
+         <record id="action_reporte_ventas_sv" model="ir.actions.act_window">
+            <field name="name">Libro de Ventas SV</field>
+            <field name="res_model">l10n_sv_extra.asistente_reporte_ventas</field>
+            <field name="binding_model_id" ref="account.model_account_journal"/> <!-- Modelo vinculado -->
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <menuitem
+                action="action_reporte_ventas_sv"
+                id="menu_asistente_reporte_ventas"
+                parent="menu_informes"
+                groups="l10n_sv.group_fel_restricted_fields_sv"/>
+
+        <record id="action_reporte_ventas" model="ir.actions.report">
+            <field name="name">Libro de Ventas</field>
+            <field name="model">l10n_sv_extra.asistente_reporte_ventas</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">l10n_sv_extra.reporte_ventas</field>
+            <field name="file">l10n_sv_extra.reporte_ventas</field>
+        </record>
         <!--  ###################### REPORTE COMPRAS ##################################-->
         <record id="asistente_compras_reporte" model="ir.ui.view">
             <field name="name">l10n_sv_extra.asistente_reporte_compras</field>
@@ -82,12 +97,27 @@
             </field>
         </record>
 
-        <act_window id="window_reporte_compras" name="Libro de compras"
-                    res_model="l10n_sv_extra.asistente_reporte_compras" binding_model="account.journal" view_mode="form"
-                    target="new"/>
-        <menuitem action="window_reporte_compras" id="menu_asistente_reporte_compras" parent="menu_informes"/>
-        <report id="action_reporte_compras" model="l10n_sv_extra.asistente_reporte_compras" string="Libro de compras"
-                report_type="qweb-pdf" name="l10n_sv_extra.reporte_compras" file="l10n_sv_extra.reporte_compras"/>
+        <record id="action_reporte_compras_sv" model="ir.actions.act_window">
+            <field name="name">Libro de Compras SV</field>
+            <field name="res_model">l10n_sv_extra.asistente_reporte_compras</field>
+            <field name="binding_model_id" ref="account.model_account_journal"/> <!-- Modelo vinculado -->
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem action="action_reporte_compras_sv"
+                  id="menu_asistente_reporte_compras"
+                  parent="menu_informes"
+                  groups="l10n_sv.group_fel_restricted_fields_sv"/>
+
+        <!-- Definición del reporte -->
+        <record id="action_reporte_compras" model="ir.actions.report">
+            <field name="name">Libro de Compras</field>
+            <field name="model">l10n_sv_extra.asistente_reporte_compras</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">l10n_sv_extra.reporte_compras</field>
+            <field name="file">l10n_sv_extra.reporte_compras</field>
+        </record>
 
         <!--   ##################  REPORTE MAYOR ###########################-->
         <record id="asistente_reporte_mayor" model="ir.ui.view">
@@ -124,42 +154,57 @@
             </field>
         </record>
 
-        <act_window id="window_reporte_mayor" name="Libro mayor" res_model="l10n_sv_extra.asistente_reporte_mayor"
-                    binding_model="account.account" view_mode="form" target="new"/>
-        <menuitem action="window_reporte_mayor" id="menu_asistente_reporte_mayor" parent="menu_informes"/>
-        <report id="action_reporte_mayor" model="l10n_sv_extra.asistente_reporte_mayor" string="Libro Mayor"
-                report_type="qweb-pdf" name="l10n_sv_extra.reporte_mayor" file="l10n_sv_extra.reporte_mayor"/>
+        <record id="action_reporte_mayor_sv" model="ir.actions.act_window">
+            <field name="name">Libro Mayor SV</field>
+            <field name="res_model">l10n_sv_extra.asistente_reporte_mayor</field>
+            <field name="binding_model_id" ref="account.model_account_account"/>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem action="action_reporte_mayor_sv"
+                  id="menu_asistente_reporte_mayor"
+                  parent="menu_informes"
+                  groups="l10n_sv.group_fel_restricted_fields_sv"/>
+
+        <record id="action_reporte_mayor" model="ir.actions.report">
+            <field name="name">Libro Mayor</field>
+            <field name="model">l10n_sv_extra.asistente_reporte_mayor</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">l10n_sv_extra.reporte_mayor</field>
+            <field name="file">l10n_sv_extra.reporte_mayor</field>
+        </record>
 
         <!-- ################## KARDEX ################################################-->
-        <record id="kardex_asistente_kardex" model="ir.ui.view">
-            <field name="name">kardex_asistente_kardex</field>
-            <field name="model">l10n_sv_extra.asistente_kardex</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Seleccione cuenta y rango de fecha">
+<!--        <record id="kardex_asistente_kardex" model="ir.ui.view">-->
+<!--            <field name="name">kardex_asistente_kardex</field>-->
+<!--            <field name="model">l10n_sv_extra.asistente_kardex</field>-->
+<!--            <field name="type">form</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <form string="Seleccione cuenta y rango de fecha">-->
 
-                    <group>
-                        <group>
-                            <field name="ubicacion_id"/>
-                            <field name="name_excel" invisible="1"/>
-                            <field name="archivo_excel" readonly="1" filename="name_excel"/>
-                        </group>
-                        <group>
-                            <field name="fecha_desde"/>
-                            <field name="fecha_hasta"/>
-                        </group>
-                    </group>
-                    <group>
-                        <field name="producto_ids"/>
-                    </group>
-                    <footer>
-                        <button name="print_report" string="Reporte PDF" type="object" class="oe_highlight"/>
-                        o
-                        <button special="cancel" string="Cancel" class="oe_link"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="ubicacion_id"/>-->
+<!--                            <field name="name_excel" invisible="1"/>-->
+<!--                            <field name="archivo_excel" readonly="1" filename="name_excel"/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--                            <field name="fecha_desde"/>-->
+<!--                            <field name="fecha_hasta"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+<!--                    <group>-->
+<!--                        <field name="producto_ids"/>-->
+<!--                    </group>-->
+<!--                    <footer>-->
+<!--                        <button name="print_report" string="Reporte PDF" type="object" class="oe_highlight"/>-->
+<!--                        o-->
+<!--                        <button special="cancel" string="Cancel" class="oe_link"/>-->
+<!--                    </footer>-->
+<!--                </form>-->
+<!--            </field>-->
+<!--        </record>-->
 
 <!--        <record model="ir.actions.act_window" id="action_kardex_wizard">-->
 <!--            <field name="name">Kardex</field>-->

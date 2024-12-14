@@ -10,6 +10,8 @@ from .formatos_excel import obtener_formatos_excel
 
 class AsistenteReporteMayor(models.TransientModel):
     _name = 'l10n_sv_extra.asistente_reporte_mayor'
+    _description = 'asistente_reporte_mayor'
+
 
     def _default_cuenta(self):
         if len(self.env.context.get('active_ids', [])) > 0:
@@ -25,7 +27,7 @@ class AsistenteReporteMayor(models.TransientModel):
     fecha_desde = fields.Date(string="Fecha Inicial", required=True, default=lambda self: time.strftime('%Y-%m-01'))
     fecha_hasta = fields.Date(string="Fecha Final", required=True, default=lambda self: time.strftime('%Y-%m-%d'))
     name = fields.Char('Nombre archivo', size=32)
-    archivo = fields.Binary('Archivo', filters='.xls')
+    archivo = fields.Binary('Archivo', )
 
     def print_report(self):
         data = {

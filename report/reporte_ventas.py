@@ -7,6 +7,8 @@ import logging
 
 class ReporteVentas(models.AbstractModel):
     _name = 'report.l10n_sv_extra.reporte_ventas'
+    _description = 'reporte_ventas'
+
 
     def lineas(self, datos):
         totales = {}

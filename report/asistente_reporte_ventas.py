@@ -11,6 +11,8 @@ from .formatos_excel import obtener_formatos_excel
 
 class AsistenteReporteVentas(models.TransientModel):
     _name = 'l10n_sv_extra.asistente_reporte_ventas'
+    _description = 'asistente_reporte_ventas'
+
 
     diarios_id = fields.Many2many("account.journal", string="Diarios", required=True)
     impuesto_id = fields.Many2one("account.tax", string="Impuesto", required=True)
@@ -19,7 +21,7 @@ class AsistenteReporteVentas(models.TransientModel):
     fecha_desde = fields.Date(string="Fecha Inicial", required=True, default=lambda self: time.strftime('%Y-%m-01'))
     fecha_hasta = fields.Date(string="Fecha Final", required=True, default=lambda self: time.strftime('%Y-%m-%d'))
     name = fields.Char('Nombre archivo', default='reporte_ventas.xlsx',size=32)
-    archivo = fields.Binary('Archivo', filters='.xls')
+    archivo = fields.Binary('Archivo', )
 
     def print_report_contribuyente(self):
         self.resumido = False

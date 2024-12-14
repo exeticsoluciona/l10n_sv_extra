@@ -5,8 +5,8 @@
     'version': '16.0.0.0',
     'category': 'Localization',
     'description': """ Reportes requeridos y otra funcionalidad extra para llevar un contabilidad en El Salvador. """,
-    'author': 'Aquih, S.A.',
-    'website': 'http://aquih.com/',
+      'author': 'Alexander Garzo',
+    'website': 'http://integrall.solutions/',
     'depends': ['l10n_sv'],
     'data': [
         'views/account_view.xml',
@@ -19,5 +19,6 @@
     ],
     'demo': [],
     'installable': True,
+    'license': 'LGPL-3',
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

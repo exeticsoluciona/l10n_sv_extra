@@ -7,6 +7,7 @@ import logging
 
 class ReporteCompras(models.AbstractModel):
     _name = 'report.l10n_sv_extra.reporte_compras'
+    _description = 'reporte_compras'
 
     def lineas(self, datos):
         totales = {}
@@ -84,13 +85,13 @@ class ReporteCompras(models.AbstractModel):
                 precio = ( l.price_unit * (1-(l.discount or 0.0)/100.0) ) * tipo_cambio
                 if tipo == 'NC':
                     precio = precio * -1
-
-                tipo_linea = f.tipo_gasto
-                if f.tipo_gasto == 'mixto':
-                    if l.product_id.type == 'product':
-                        tipo_linea = 'compra'
-                    else:
-                        tipo_linea = 'servicio'
+                # TIPO DE LINEA NO SE ESTA USANDO EN EL REPORTE
+                tipo_linea = 'servicio'
+                # if f.tipo_gasto == 'mixto':
+                #     if l.product_id.type == 'product':
+                #         tipo_linea = 'compra'
+                #     else:
+                #         tipo_linea = 'servicio'
 
                 r = l.tax_ids.compute_all(precio, currency=f.currency_id, quantity=l.quantity, product=l.product_id, partner=f.partner_id)
 
