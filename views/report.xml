@@ -53,13 +53,13 @@
                 parent="menu_informes"
                 groups="l10n_sv.group_fel_restricted_fields_sv"/>
 
-        <record id="action_reporte_ventas" model="ir.actions.report">
-            <field name="name">Libro de Ventas</field>
-            <field name="model">l10n_sv_extra.asistente_reporte_ventas</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">l10n_sv_extra.reporte_ventas</field>
-            <field name="file">l10n_sv_extra.reporte_ventas</field>
-        </record>
+<!--        <record id="action_reporte_ventas" model="ir.actions.report">-->
+<!--            <field name="name">Libro de Ventas</field>-->
+<!--            <field name="model">l10n_sv_extra.asistente_reporte_ventas</field>-->
+<!--            <field name="report_type">qweb-pdf</field>-->
+<!--            <field name="report_name">l10n_sv_extra.reporte_ventas</field>-->
+<!--            <field name="file">l10n_sv_extra.reporte_ventas</field>-->
+<!--        </record>-->
         <!--  ###################### REPORTE COMPRAS ##################################-->
         <record id="asistente_compras_reporte" model="ir.ui.view">
             <field name="name">l10n_sv_extra.asistente_reporte_compras</field>
@@ -111,13 +111,13 @@
                   groups="l10n_sv.group_fel_restricted_fields_sv"/>
 
         <!-- Definición del reporte -->
-        <record id="action_reporte_compras" model="ir.actions.report">
-            <field name="name">Libro de Compras</field>
-            <field name="model">l10n_sv_extra.asistente_reporte_compras</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">l10n_sv_extra.reporte_compras</field>
-            <field name="file">l10n_sv_extra.reporte_compras</field>
-        </record>
+<!--        <record id="action_reporte_compras" model="ir.actions.report">-->
+<!--            <field name="name">Libro de Compras</field>-->
+<!--            <field name="model">l10n_sv_extra.asistente_reporte_compras</field>-->
+<!--            <field name="report_type">qweb-pdf</field>-->
+<!--            <field name="report_name">l10n_sv_extra.reporte_compras</field>-->
+<!--            <field name="file">l10n_sv_extra.reporte_compras</field>-->
+<!--        </record>-->
 
         <!--   ##################  REPORTE MAYOR ###########################-->
         <record id="asistente_reporte_mayor" model="ir.ui.view">
@@ -167,13 +167,13 @@
                   parent="menu_informes"
                   groups="l10n_sv.group_fel_restricted_fields_sv"/>
 
-        <record id="action_reporte_mayor" model="ir.actions.report">
-            <field name="name">Libro Mayor</field>
-            <field name="model">l10n_sv_extra.asistente_reporte_mayor</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="report_name">l10n_sv_extra.reporte_mayor</field>
-            <field name="file">l10n_sv_extra.reporte_mayor</field>
-        </record>
+<!--        <record id="action_reporte_mayor" model="ir.actions.report">-->
+<!--            <field name="name">Libro Mayor</field>-->
+<!--            <field name="model">l10n_sv_extra.asistente_reporte_mayor</field>-->
+<!--            <field name="report_type">qweb-pdf</field>-->
+<!--            <field name="report_name">l10n_sv_extra.reporte_mayor</field>-->
+<!--            <field name="file">l10n_sv_extra.reporte_mayor</field>-->
+<!--        </record>-->
 
         <!-- ################## KARDEX ################################################-->
 <!--        <record id="kardex_asistente_kardex" model="ir.ui.view">-->
