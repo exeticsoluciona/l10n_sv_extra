@@ -98,6 +98,8 @@ class ReporteCompras(models.AbstractModel):
 
                 if len(l.tax_ids) > 0:
                     for i in r['taxes']:
+                        print(f.name,"nameee")
+                        print(i,'iiiiiii')
                         if i['id'] == datos['impuesto_id'][0]:
                             # AQUI DEBERIA DE CLASIFICARLO SEGUN EL TIPO DE GRAVADAS POR AHORA TODAS VAN PARA INTERNAS
                             linea['gravadas_internas'] += r['total_excluded']
@@ -106,13 +108,22 @@ class ReporteCompras(models.AbstractModel):
                             totales['grand_total']['gravadas_internas'] += r['total_excluded']
                             totales['grand_total']['iva'] += i['amount']
                         elif i['amount'] > 0:
+
                             linea['exentas_internas'] += r['total_excluded']
+                            # TOTAL AL FINAL DE LA COLUMNA SEGUN TIPO DE LINEA
                             totales[tipo_linea]['exento'] += i['amount']
+                        # SI TIENE RETENCION ES NEGATIVO Y QUEIRE DECIR QUE ES FSE
+                        elif i['amount'] < 0:
+                            #
+                            linea['exentas_internas'] += r['total_excluded']
+                            totales['grand_total']['exento_interno'] += r['total_excluded']
+
                 else:
                     linea['exentas_internas'] += r['total_excluded']
-                    totales[tipo_linea]['exento'] += i['amount']
 
+                # TOTAL AL FINAL DE LA FILA
                 linea['total'] += precio * l.quantity
+                # COLUMNA TOTAL COMPRAS
                 totales['grand_total']['total'] += precio * l.quantity
 
             # if f.partner_id.pequenio_contribuyente:
