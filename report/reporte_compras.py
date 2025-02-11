@@ -80,6 +80,8 @@ class ReporteCompras(models.AbstractModel):
                 'excl':0
             }
 
+
+
             correlativo += 1
             for l in f.invoice_line_ids:
                 precio = ( l.price_unit * (1-(l.discount or 0.0)/100.0) ) * tipo_cambio
@@ -115,16 +117,17 @@ class ReporteCompras(models.AbstractModel):
                         # SI TIENE RETENCION ES NEGATIVO Y QUEIRE DECIR QUE ES FSE
                         elif i['amount'] < 0:
                             #
-                            linea['exentas_internas'] += r['total_excluded']
-                            totales['grand_total']['exento_interno'] += r['total_excluded']
+                            linea['excl'] += r['total_excluded']
+                            totales['grand_total']['excl'] += r['total_excluded']
 
                 else:
                     linea['exentas_internas'] += r['total_excluded']
-
-                # TOTAL AL FINAL DE LA FILA
-                linea['total'] += precio * l.quantity
-                # COLUMNA TOTAL COMPRAS
-                totales['grand_total']['total'] += precio * l.quantity
+                # SI ES DIFERETEN A FACTRUA DE SUJETO EXCLUIDO LO SUMAMOS EN LA COLUMNA TOTAL COMPRAS, SINO SE QUEDA EN COMPRAS SUJETO EXCL
+                if f.journal_id.tipo_documento_fel_sv != '14':
+                    # TOTAL AL FINAL DE LA FILA
+                    linea['total'] += precio * l.quantity
+                    # COLUMNA TOTAL COMPRAS
+                    totales['grand_total']['total'] += precio * l.quantity
 
             # if f.partner_id.pequenio_contribuyente:
             #     totales['pequenio_contribuyente'] += linea['base']
